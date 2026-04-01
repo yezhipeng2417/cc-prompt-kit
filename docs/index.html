@@ -60,6 +60,29 @@ h1, h2, h3, h4 { letter-spacing: -0.01em; }
 }
 .lang-btn:hover { border-color: var(--accent); color: var(--accent); }
 
+.star-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 18px;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+  background: var(--bg);
+  color: var(--text);
+  font-size: 14px;
+  font-weight: 600;
+  text-decoration: none;
+  margin-bottom: 1.5rem;
+  transition: border-color .2s, box-shadow .2s;
+}
+.star-btn:hover {
+  border-color: var(--accent);
+  box-shadow: 0 2px 8px rgba(99,102,241,0.12);
+  text-decoration: none;
+  color: var(--accent);
+}
+.star-btn svg { flex-shrink: 0; }
+
 body.zh .en { display: none; }
 body.zh .zh { display: block; }
 body:not(.zh) .zh { display: none; }
@@ -444,6 +467,10 @@ footer {
     <p class="tagline en">A prompt engineering toolkit built on techniques extracted from Claude Code's internal prompt architecture.</p>
     <p class="tagline zh">基于 Claude Code 内部 prompt 架构分析提炼的 prompt 工程工具包。</p>
     <div class="install">/plugin &rarr; louisyeaaah/cc-prompt-kit</div>
+    <a class="star-btn" href="https://github.com/louisyeaaah/cc-prompt-kit" target="_blank">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+      <span class="en">Star on GitHub</span><span class="zh">GitHub 上点个星</span>
+    </a>
     <div class="pills">
       <span class="pill"><b>5</b> Skills</span>
       <span class="pill"><b>8</b> Techniques</span>
@@ -840,6 +867,12 @@ Complex commands (add context):
   <h2 class="zh">10 秒安装</h2>
   <br>
   <div class="install" style="font-size:1rem;padding:0.7rem 1.5rem;">/plugin &rarr; louisyeaaah/cc-prompt-kit</div>
+  <div style="margin-top:1rem;">
+    <a class="star-btn" href="https://github.com/louisyeaaah/cc-prompt-kit" target="_blank">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+      <span class="en">Star on GitHub</span><span class="zh">GitHub 上点个星</span>
+    </a>
+  </div>
   <p style="color:var(--text3);margin-top:1rem;font-size:14px;" class="en">Or clone manually:</p>
   <p style="color:var(--text3);margin-top:1rem;font-size:14px;" class="zh">或手动克隆：</p>
   <div class="cb" style="display:inline-block;text-align:left;margin-top:6px;font-size:13px;">git clone https://github.com/louisyeaaah/cc-prompt-kit.git ~/.claude/plugins/cc-prompt-kit</div>
