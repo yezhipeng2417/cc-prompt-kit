@@ -1,0 +1,25 @@
+{
+  "name": "cc-prompt-kit",
+  "owner": {
+    "name": "Zhipeng Ye",
+    "email": "yezhipeng2417@gmail.com"
+  },
+  "metadata": {
+    "description": "Prompt engineering toolkit with techniques extracted from Claude Code's internal prompts",
+    "version": "1.1.0"
+  },
+  "plugins": [
+    {
+      "name": "cc-prompt-kit",
+      "source": "./plugins/cc-prompt-kit",
+      "description": "5 prompt engineering skills (architect, forge, judge, debug, compress) derived from analyzing Claude Code's 512K LOC source",
+      "version": "1.1.0",
+      "author": {
+        "name": "Zhipeng Ye"
+      },
+      "license": "MIT",
+      "keywords": ["prompt-engineering", "claude-code", "prompt-optimization"],
+      "category": "development"
+    }
+  ]
+}

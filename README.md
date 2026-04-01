@@ -27,19 +27,29 @@ prompt-architect ──→ prompt-forge ──→ prompt-judge
 
 ## Installation
 
-Copy this plugin to your Claude Code plugins directory:
+### Via Marketplace (Recommended)
+
+In Claude Code, run:
+
+```
+/plugin
+```
+
+Then enter the marketplace source:
+
+```
+yezhipeng2417/cc-prompt-kit
+```
+
+Select `cc-prompt-kit` from the plugin list and install. Done.
+
+### Manual Installation
 
 ```bash
-# Clone
-git clone https://github.com/yezhipeng2417/cc-prompt-kit.git
-
-# Copy to Claude Code plugins
-cp -r cc-prompt-kit ~/.claude/plugins/cc-prompt-kit
+git clone https://github.com/yezhipeng2417/cc-prompt-kit.git ~/.claude/plugins/cc-prompt-kit
 ```
 
 Then in Claude Code, run `/reload-plugins` to activate.
-
-Or simply place the entire directory under `~/.claude/plugins/` and reload.
 
 ## Skills in Detail
 

@@ -1,0 +1,11 @@
+{
+  "name": "cc-prompt-kit",
+  "description": "Prompt engineering toolkit — 5 skills (architect, forge, judge, debug, compress) with techniques extracted from Claude Code's internal prompt architecture",
+  "version": "1.1.0",
+  "author": {
+    "name": "Zhipeng Ye"
+  },
+  "homepage": "https://github.com/yezhipeng2417/cc-prompt-kit",
+  "repository": "https://github.com/yezhipeng2417/cc-prompt-kit",
+  "license": "MIT"
+}
