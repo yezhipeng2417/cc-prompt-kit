@@ -1,0 +1,1079 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>cc-prompt-kit — Prompt Engineering from Claude Code's DNA</title>
+<style>
+:root {
+  --bg: #ffffff;
+  --bg-alt: #f8f9fa;
+  --bg-code: #f1f5f9;
+  --text: #1a1a2e;
+  --text-muted: #64748b;
+  --text-light: #94a3b8;
+  --accent: #6366f1;
+  --accent2: #a855f7;
+  --accent-light: #eef2ff;
+  --accent-light2: #faf5ff;
+  --border: #e2e8f0;
+  --green: #10b981;
+  --orange: #f59e0b;
+  --red: #ef4444;
+  --blue: #3b82f6;
+  --pink: #ec4899;
+  --shadow-sm: 0 1px 3px rgba(0,0,0,0.06);
+  --shadow-md: 0 4px 12px rgba(0,0,0,0.08);
+  --radius: 12px;
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Noto Sans SC', sans-serif;
+  color: var(--text);
+  background: var(--bg);
+  line-height: 1.7;
+  -webkit-font-smoothing: antialiased;
+}
+
+.container { max-width: 1080px; margin: 0 auto; padding: 0 1.5rem; }
+.container-wide { max-width: 1200px; margin: 0 auto; padding: 0 1.5rem; }
+
+/* ===== Hero ===== */
+.hero {
+  min-height: 90vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 4rem 1.5rem;
+  position: relative;
+  overflow: hidden;
+}
+
+.hero::before {
+  content: '';
+  position: absolute;
+  top: -40%;
+  right: -20%;
+  width: 600px;
+  height: 600px;
+  background: radial-gradient(circle, rgba(99,102,241,0.06) 0%, transparent 70%);
+  border-radius: 50%;
+}
+
+.hero::after {
+  content: '';
+  position: absolute;
+  bottom: -30%;
+  left: -10%;
+  width: 500px;
+  height: 500px;
+  background: radial-gradient(circle, rgba(168,85,247,0.05) 0%, transparent 70%);
+  border-radius: 50%;
+}
+
+.hero-content { position: relative; z-index: 1; max-width: 720px; }
+
+.hero-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.82rem;
+  font-weight: 500;
+  color: var(--accent);
+  background: var(--accent-light);
+  padding: 0.4rem 1rem;
+  border-radius: 100px;
+  margin-bottom: 1.5rem;
+}
+
+.hero h1 {
+  font-size: clamp(2.5rem, 5vw, 3.8rem);
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  line-height: 1.15;
+  margin-bottom: 1rem;
+}
+
+.hero h1 span {
+  background: linear-gradient(135deg, var(--accent), var(--accent2));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.hero .subtitle {
+  font-size: 1.15rem;
+  color: var(--text-muted);
+  margin-bottom: 2rem;
+  max-width: 560px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.install-box {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.75rem;
+  background: var(--bg-code);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 0.65rem 1.25rem;
+  font-family: 'SF Mono', 'Fira Code', monospace;
+  font-size: 0.9rem;
+  color: var(--text);
+  margin-bottom: 2.5rem;
+}
+
+.install-box .label {
+  color: var(--text-light);
+  font-size: 0.78rem;
+  font-family: -apple-system, sans-serif;
+}
+
+.stats-row {
+  display: flex;
+  gap: 1.5rem;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.stat-pill {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 100px;
+  padding: 0.4rem 0.9rem;
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: var(--text);
+  box-shadow: var(--shadow-sm);
+}
+
+.stat-pill .num {
+  background: linear-gradient(135deg, var(--accent), var(--accent2));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+/* ===== Section ===== */
+section { padding: 5rem 0; }
+section.alt { background: var(--bg-alt); }
+
+.section-label {
+  display: inline-block;
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.15em;
+  color: var(--accent);
+  margin-bottom: 0.75rem;
+}
+
+.section-title {
+  font-size: 2rem;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  margin-bottom: 0.5rem;
+}
+
+.section-subtitle {
+  color: var(--text-muted);
+  font-size: 1.05rem;
+  margin-bottom: 2.5rem;
+  max-width: 600px;
+}
+
+.section-header { margin-bottom: 3rem; }
+
+/* ===== Cards ===== */
+.card {
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 1.5rem;
+  box-shadow: var(--shadow-sm);
+  transition: box-shadow 0.2s, transform 0.2s;
+}
+
+.card:hover {
+  box-shadow: var(--shadow-md);
+  transform: translateY(-2px);
+}
+
+.card h3 {
+  font-size: 1.05rem;
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+}
+
+.card p { color: var(--text-muted); font-size: 0.9rem; }
+
+/* ===== Grids ===== */
+.grid-5 { display: grid; grid-template-columns: repeat(5, 1fr); gap: 1rem; }
+.grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.5rem; }
+.grid-2 { display: grid; grid-template-columns: repeat(2, 1fr); gap: 1.5rem; }
+
+@media (max-width: 900px) {
+  .grid-5 { grid-template-columns: repeat(3, 1fr); }
+  .grid-3 { grid-template-columns: 1fr; }
+}
+@media (max-width: 640px) {
+  .grid-5 { grid-template-columns: repeat(2, 1fr); }
+  .grid-2 { grid-template-columns: 1fr; }
+  .hero h1 { font-size: 2rem; }
+  section { padding: 3rem 0; }
+}
+
+/* ===== Skill Cards ===== */
+.skill-card { text-align: center; padding: 1.75rem 1rem; }
+.skill-icon { font-size: 2rem; margin-bottom: 0.75rem; }
+.skill-name { font-size: 0.9rem; font-weight: 700; color: var(--text); margin-bottom: 0.35rem; }
+.skill-desc { font-size: 0.78rem; color: var(--text-muted); line-height: 1.5; }
+
+/* ===== Workflow ===== */
+.workflow {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.35rem;
+  flex-wrap: wrap;
+  margin: 2rem 0;
+  font-size: 0.85rem;
+}
+
+.wf-step {
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 0.5rem 0.85rem;
+  font-weight: 500;
+  white-space: nowrap;
+  box-shadow: var(--shadow-sm);
+}
+
+.wf-step.active {
+  background: linear-gradient(135deg, var(--accent), var(--accent2));
+  color: white;
+  border-color: transparent;
+}
+
+.wf-arrow { color: var(--text-light); font-size: 0.9rem; }
+
+/* ===== Code comparison ===== */
+.code-compare {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+  margin: 1rem 0 1.5rem;
+}
+
+@media (max-width: 640px) {
+  .code-compare { grid-template-columns: 1fr; }
+}
+
+.code-block {
+  background: var(--bg-code);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 1rem 1.25rem;
+  font-family: 'SF Mono', 'Fira Code', monospace;
+  font-size: 0.82rem;
+  line-height: 1.6;
+  overflow-x: auto;
+  position: relative;
+}
+
+.code-block::before {
+  content: attr(data-label);
+  position: absolute;
+  top: 0.5rem;
+  right: 0.75rem;
+  font-family: -apple-system, sans-serif;
+  font-size: 0.65rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  padding: 0.15rem 0.5rem;
+  border-radius: 4px;
+}
+
+.code-block.weak::before { content: 'BEFORE'; color: var(--red); background: rgba(239,68,68,0.1); }
+.code-block.strong::before { content: 'AFTER'; color: var(--green); background: rgba(16,185,129,0.1); }
+
+.code-block .kw { color: var(--accent); }
+.code-block .cm { color: var(--text-light); font-style: italic; }
+.code-block .str { color: var(--green); }
+
+/* ===== Technique card ===== */
+.technique {
+  margin-bottom: 3rem;
+  padding-bottom: 3rem;
+  border-bottom: 1px solid var(--border);
+}
+
+.technique:last-child { border-bottom: none; margin-bottom: 0; padding-bottom: 0; }
+
+.technique-header {
+  display: flex;
+  align-items: baseline;
+  gap: 0.75rem;
+  margin-bottom: 0.75rem;
+}
+
+.technique-num {
+  font-size: 0.7rem;
+  font-weight: 700;
+  color: var(--accent);
+  background: var(--accent-light);
+  padding: 0.25rem 0.6rem;
+  border-radius: 6px;
+  flex-shrink: 0;
+}
+
+.technique h3 { font-size: 1.25rem; font-weight: 700; }
+.technique h3 .en { color: var(--text-muted); font-weight: 400; font-size: 0.9rem; margin-left: 0.5rem; }
+
+.technique .explanation { color: var(--text-muted); font-size: 0.95rem; margin-bottom: 1rem; }
+
+.source-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  font-size: 0.75rem;
+  color: var(--text-light);
+  margin-top: 0.75rem;
+}
+
+/* ===== Insight ===== */
+.insight {
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 2rem;
+  box-shadow: var(--shadow-sm);
+}
+
+.insight h3 { font-size: 1.1rem; font-weight: 700; margin-bottom: 0.75rem; }
+.insight p { color: var(--text-muted); font-size: 0.92rem; }
+
+.insight-num {
+  display: inline-block;
+  font-size: 0.7rem;
+  font-weight: 700;
+  color: white;
+  background: linear-gradient(135deg, var(--accent), var(--accent2));
+  width: 24px;
+  height: 24px;
+  line-height: 24px;
+  text-align: center;
+  border-radius: 6px;
+  margin-bottom: 0.75rem;
+}
+
+/* ===== Table ===== */
+.table-wrap {
+  overflow-x: auto;
+  border-radius: var(--radius);
+  border: 1px solid var(--border);
+  box-shadow: var(--shadow-sm);
+  margin: 1.5rem 0;
+}
+
+table { width: 100%; border-collapse: collapse; font-size: 0.88rem; }
+
+th {
+  background: var(--bg-alt);
+  font-weight: 600;
+  text-align: left;
+  padding: 0.8rem 1rem;
+  border-bottom: 1px solid var(--border);
+  white-space: nowrap;
+  color: var(--text);
+}
+
+td {
+  padding: 0.7rem 1rem;
+  border-bottom: 1px solid var(--border);
+  color: var(--text-muted);
+}
+
+tr:last-child td { border-bottom: none; }
+tr:hover td { background: rgba(99,102,241,0.02); }
+
+td:first-child { color: var(--text); font-weight: 500; }
+
+/* ===== Badge ===== */
+.badge {
+  display: inline-block;
+  font-size: 0.68rem;
+  font-weight: 600;
+  padding: 0.15rem 0.5rem;
+  border-radius: 4px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.badge-green { background: rgba(16,185,129,0.1); color: var(--green); }
+.badge-blue { background: rgba(59,130,246,0.1); color: var(--blue); }
+.badge-purple { background: rgba(168,85,247,0.1); color: var(--accent2); }
+.badge-orange { background: rgba(245,158,11,0.1); color: var(--orange); }
+.badge-red { background: rgba(239,68,68,0.1); color: var(--red); }
+.badge-pink { background: rgba(236,72,153,0.1); color: var(--pink); }
+
+/* ===== Architecture Diagram ===== */
+.arch-diagram {
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 2rem;
+  box-shadow: var(--shadow-sm);
+  margin: 2rem 0;
+}
+
+.arch-layer {
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 1rem 1.25rem;
+  margin-bottom: 0.5rem;
+  position: relative;
+}
+
+.arch-layer.static {
+  background: linear-gradient(135deg, rgba(99,102,241,0.04), rgba(168,85,247,0.04));
+  border-color: rgba(99,102,241,0.2);
+}
+
+.arch-layer.dynamic {
+  background: rgba(245,158,11,0.04);
+  border-color: rgba(245,158,11,0.2);
+}
+
+.arch-layer-label {
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  margin-bottom: 0.35rem;
+}
+
+.arch-layer.static .arch-layer-label { color: var(--accent); }
+.arch-layer.dynamic .arch-layer-label { color: var(--orange); }
+.arch-layer-items { font-size: 0.82rem; color: var(--text-muted); }
+
+.arch-boundary {
+  text-align: center;
+  padding: 0.5rem 0;
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.15em;
+  color: var(--text-light);
+  position: relative;
+}
+
+.arch-boundary::before,
+.arch-boundary::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  width: 30%;
+  height: 1px;
+  background: repeating-linear-gradient(90deg, var(--border) 0, var(--border) 6px, transparent 6px, transparent 12px);
+}
+
+.arch-boundary::before { left: 0; }
+.arch-boundary::after { right: 0; }
+
+/* ===== Grade Scale ===== */
+.grade-row {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.4rem 0;
+}
+
+.grade-letter {
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 800;
+  font-size: 0.85rem;
+  color: white;
+  flex-shrink: 0;
+}
+
+.grade-s { background: linear-gradient(135deg, var(--accent), var(--accent2)); }
+.grade-a { background: var(--green); }
+.grade-b { background: var(--blue); }
+.grade-c { background: var(--orange); }
+.grade-d { background: var(--red); }
+.grade-f { background: #6b7280; }
+
+.grade-info { font-size: 0.85rem; }
+.grade-range { color: var(--text-light); font-size: 0.78rem; }
+
+/* ===== Pipeline ===== */
+.pipeline {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+  margin: 1.5rem 0;
+}
+
+.pipe-stage {
+  flex: 1;
+  min-width: 140px;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 1rem;
+  text-align: center;
+  box-shadow: var(--shadow-sm);
+}
+
+.pipe-num {
+  font-size: 0.65rem;
+  font-weight: 700;
+  color: var(--accent);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  margin-bottom: 0.25rem;
+}
+
+.pipe-name { font-size: 0.85rem; font-weight: 600; margin-bottom: 0.2rem; }
+.pipe-save { font-size: 0.75rem; color: var(--green); font-weight: 600; }
+
+/* ===== Footer ===== */
+footer {
+  text-align: center;
+  padding: 3rem 1.5rem;
+  color: var(--text-light);
+  font-size: 0.85rem;
+  border-top: 1px solid var(--border);
+}
+
+footer a { color: var(--accent); text-decoration: none; }
+footer a:hover { text-decoration: underline; }
+
+/* ===== Misc ===== */
+a { color: var(--accent); text-decoration: none; }
+a:hover { text-decoration: underline; }
+
+.callout {
+  border-left: 3px solid var(--accent);
+  background: var(--accent-light);
+  padding: 1rem 1.25rem;
+  border-radius: 0 8px 8px 0;
+  font-size: 0.9rem;
+  color: var(--text-muted);
+  margin: 1.5rem 0;
+}
+
+.callout strong { color: var(--text); }
+
+.sep {
+  width: 48px;
+  height: 3px;
+  background: linear-gradient(90deg, var(--accent), var(--accent2));
+  border-radius: 2px;
+  margin: 2rem 0;
+}
+
+code {
+  font-family: 'SF Mono', 'Fira Code', monospace;
+  font-size: 0.85em;
+  background: var(--bg-code);
+  padding: 0.15em 0.4em;
+  border-radius: 4px;
+  border: 1px solid var(--border);
+}
+</style>
+</head>
+<body>
+
+<!-- ==================== HERO ==================== -->
+<div class="hero">
+  <div class="hero-content">
+    <div class="hero-badge">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>
+      Claude Code Plugin
+    </div>
+    <h1><span>cc-prompt-kit</span></h1>
+    <p class="subtitle">Prompt engineering toolkit with techniques extracted from Claude Code's internal prompt architecture &mdash; 512K+ lines of source, distilled into 5 actionable skills.</p>
+    <div class="install-box">
+      <span class="label">Install</span>
+      <span>/plugin &rarr; yezhipeng2417/cc-prompt-kit</span>
+    </div>
+    <div class="stats-row">
+      <span class="stat-pill"><span class="num">5</span> Skills</span>
+      <span class="stat-pill"><span class="num">8</span> Techniques</span>
+      <span class="stat-pill"><span class="num">9</span> Fault Patterns</span>
+      <span class="stat-pill"><span class="num">6</span>-Stage Compression</span>
+      <span class="stat-pill"><span class="num">40</span>-Point Scoring</span>
+    </div>
+  </div>
+</div>
+
+<!-- ==================== SKILLS OVERVIEW ==================== -->
+<section class="alt">
+<div class="container-wide">
+  <div class="section-header">
+    <div class="section-label">Skills</div>
+    <h2 class="section-title">Five Skills, One Workflow</h2>
+    <p class="section-subtitle">Each skill handles a different stage of the prompt engineering lifecycle.</p>
+  </div>
+
+  <div class="grid-5">
+    <div class="card skill-card">
+      <div class="skill-icon">&#128207;</div>
+      <div class="skill-name">prompt-architect</div>
+      <div class="skill-desc">From zero to prompt via guided interview</div>
+    </div>
+    <div class="card skill-card">
+      <div class="skill-icon">&#128296;</div>
+      <div class="skill-name">prompt-forge</div>
+      <div class="skill-desc">Refine and polish existing prompts</div>
+    </div>
+    <div class="card skill-card">
+      <div class="skill-icon">&#127942;</div>
+      <div class="skill-name">prompt-judge</div>
+      <div class="skill-desc">Score across 8 dimensions (40 pts)</div>
+    </div>
+    <div class="card skill-card">
+      <div class="skill-icon">&#128270;</div>
+      <div class="skill-name">prompt-debug</div>
+      <div class="skill-desc">Diagnose from symptoms to root cause</div>
+    </div>
+    <div class="card skill-card">
+      <div class="skill-icon">&#128230;</div>
+      <div class="skill-name">prompt-compress</div>
+      <div class="skill-desc">30-50% fewer tokens, same behavior</div>
+    </div>
+  </div>
+
+  <div class="workflow">
+    <span class="wf-step active">architect</span>
+    <span class="wf-arrow">&rarr;</span>
+    <span class="wf-step">judge</span>
+    <span class="wf-arrow">&rarr;</span>
+    <span class="wf-step">forge</span>
+    <span class="wf-arrow">&rarr;</span>
+    <span class="wf-step" style="opacity:0.6">test in production</span>
+    <span class="wf-arrow">&rarr;</span>
+    <span class="wf-step">debug</span>
+    <span class="wf-arrow">&rarr;</span>
+    <span class="wf-step">compress</span>
+    <span class="wf-arrow">&rarr;</span>
+    <span class="wf-step">judge</span>
+  </div>
+</div>
+</section>
+
+<!-- ==================== DISCOVERY ==================== -->
+<section>
+<div class="container">
+  <div class="section-header">
+    <div class="section-label">Discovery</div>
+    <h2 class="section-title">What We Found Inside Claude Code</h2>
+    <p class="section-subtitle">We analyzed the full 512K-line TypeScript source of Claude Code &mdash; Anthropic's official AI coding CLI &mdash; to extract the prompt engineering patterns that make it work.</p>
+  </div>
+
+  <div class="grid-3" style="margin-bottom:2.5rem;">
+    <div class="card" style="text-align:center;padding:1.75rem;">
+      <div style="font-size:2rem;font-weight:800;background:linear-gradient(135deg,var(--accent),var(--accent2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;">30+</div>
+      <div style="font-size:0.85rem;color:var(--text-muted);">Prompt Modules</div>
+    </div>
+    <div class="card" style="text-align:center;padding:1.75rem;">
+      <div style="font-size:2rem;font-weight:800;background:linear-gradient(135deg,var(--accent),var(--accent2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;">914</div>
+      <div style="font-size:0.85rem;color:var(--text-muted);">Lines in Main System Prompt</div>
+    </div>
+    <div class="card" style="text-align:center;padding:1.75rem;">
+      <div style="font-size:2rem;font-weight:800;background:linear-gradient(135deg,var(--accent),var(--accent2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;">6</div>
+      <div style="font-size:0.85rem;color:var(--text-muted);">Built-in Agent Personas</div>
+    </div>
+  </div>
+
+  <h3 style="font-size:1.1rem;margin-bottom:1rem;">Prompt Architecture: Static/Dynamic Layering</h3>
+  <div class="arch-diagram">
+    <div class="arch-layer static">
+      <div class="arch-layer-label">Static Layer (Cached Across Turns)</div>
+      <div class="arch-layer-items">Identity &bull; Constraints &bull; Tool Usage Guidelines &bull; Process Templates &bull; Contrastive Examples &bull; Tone &amp; Style &bull; Output Efficiency</div>
+    </div>
+    <div class="arch-boundary">SYSTEM_PROMPT_DYNAMIC_BOUNDARY</div>
+    <div class="arch-layer dynamic">
+      <div class="arch-layer-label">Dynamic Layer (Changes Per Turn)</div>
+      <div class="arch-layer-items">Session Memory &bull; Language Preference &bull; MCP Server Instructions &bull; Environment Info &bull; Available Skills &bull; Token Budget</div>
+    </div>
+  </div>
+
+  <div class="callout">
+    <strong>Key Discovery:</strong> Claude Code splits its system prompt with a cache boundary marker. Everything above is reused across API calls (saving tokens). Everything below is recomputed each turn. This single architectural decision has significant cost implications at scale.
+  </div>
+</div>
+</section>
+
+<!-- ==================== 8 TECHNIQUES ==================== -->
+<section class="alt">
+<div class="container">
+  <div class="section-header">
+    <div class="section-label">Techniques</div>
+    <h2 class="section-title">8 Core Prompt Engineering Techniques</h2>
+    <p class="section-subtitle">Every technique traces back to a specific pattern found in Claude Code's production prompts.</p>
+  </div>
+
+  <!-- T1 -->
+  <div class="technique">
+    <div class="technique-header">
+      <span class="technique-num">01</span>
+      <h3>Identity Framing <span class="en">&#183; 身份定义</span></h3>
+    </div>
+    <p class="explanation">A prompt without a clear identity produces generic output. The identity isn't decoration &mdash; it defines the capability boundary. Claude Code's every agent opens with a precise <code>role + strengths + constraints</code> frame.</p>
+    <div class="code-compare">
+      <div class="code-block weak">You are a helpful assistant that reviews code.</div>
+      <div class="code-block strong">You are a code review specialist. Your strengths are catching security vulnerabilities and performance issues. You NEVER suggest stylistic changes unless they affect correctness.</div>
+    </div>
+    <div class="source-tag">
+      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><path d="M14 2v6h6"/></svg>
+      Source: Every agent prompt (Explore, Plan, Verification) in <code>src/tools/AgentTool/built-in/</code>
+    </div>
+  </div>
+
+  <!-- T2 -->
+  <div class="technique">
+    <div class="technique-header">
+      <span class="technique-num">02</span>
+      <h3>Negative Constraints + Alternatives <span class="en">&#183; 负面约束+正面替代</span></h3>
+    </div>
+    <p class="explanation">Every NEVER rule in Claude Code has a corresponding positive action. A bare prohibition creates a void &mdash; the model knows what NOT to do but not what TO do. The fix: pair every prohibition with "instead, do Y."</p>
+    <div class="code-compare">
+      <div class="code-block weak">Don't make up information.</div>
+      <div class="code-block strong">NEVER fabricate citations or statistics. If you don't have the data, say "I don't have this information" and suggest where to find it.</div>
+    </div>
+    <div class="source-tag">
+      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><path d="M14 2v6h6"/></svg>
+      Source: Git safety protocol in <code>src/tools/BashTool/prompt.ts</code> &mdash; "NEVER skip hooks. If a hook fails, investigate and fix the underlying issue."
+    </div>
+  </div>
+
+  <!-- T3 -->
+  <div class="technique">
+    <div class="technique-header">
+      <span class="technique-num">03</span>
+      <h3>Contrastive Examples <span class="en">&#183; 正反对比示例</span></h3>
+    </div>
+    <p class="explanation">One good RIGHT/WRONG example pair is worth ten sentences of instruction. The model extracts the implicit quality standard from the contrast. Claude Code uses this pattern in every tool description and agent prompt.</p>
+    <div class="code-compare">
+      <div class="code-block weak">Write concise commit messages.</div>
+      <div class="code-block strong">Write concise commit messages.<br><br><span class="str">RIGHT:</span> "Fix null pointer in auth when session expires"<br><span class="cm">WRONG:</span> "Fixed a bug that was causing issues with the authentication system when users had expired sessions"</div>
+    </div>
+    <div class="source-tag">
+      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><path d="M14 2v6h6"/></svg>
+      Source: BashTool description parameter guidance with concrete command examples
+    </div>
+  </div>
+
+  <!-- T4 -->
+  <div class="technique">
+    <div class="technique-header">
+      <span class="technique-num">04</span>
+      <h3>Anti-Pattern Naming <span class="en">&#183; 失败模式命名</span></h3>
+    </div>
+    <p class="explanation">Naming a failure mode makes it a concept the model actively avoids. Claude Code's Verification Agent names two patterns: "Verification Avoidance" (reading code instead of running it) and "Seduced by 80%" (declaring pass after first checks).</p>
+    <div class="code-compare">
+      <div class="code-block weak">Don't just read the code and say it looks fine &mdash; actually run it.</div>
+      <div class="code-block strong">Avoid <span class="kw">"Verification Theater"</span> &mdash; the failure mode where you read code and declare it correct without actually executing it. Real verification requires running commands and checking output.</div>
+    </div>
+    <div class="source-tag">
+      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><path d="M14 2v6h6"/></svg>
+      Source: <code>src/tools/AgentTool/built-in/verificationAgent.ts</code> lines 10-130
+    </div>
+  </div>
+
+  <!-- T5 -->
+  <div class="technique">
+    <div class="technique-header">
+      <span class="technique-num">05</span>
+      <h3>Process Templates <span class="en">&#183; 流程模板</span></h3>
+    </div>
+    <p class="explanation">For tasks requiring consistent output, provide a fill-in-the-blank structure. Claude Code's Plan Agent uses a rigid 4-phase process; the Compact prompt has a 9-section summary template. Numbered steps prevent reordering and skipping.</p>
+    <div class="code-compare">
+      <div class="code-block weak">Analyze the security of this code.</div>
+      <div class="code-block strong"><span class="cm">Follow this structure:</span><br>1. SCAN: Read all modified files<br>2. PROFILE: Identify patterns<br>3. VALIDATE: Check against rules<br>4. REPORT: Structured findings<br><br><span class="cm">Do not skip to step 4.</span></div>
+    </div>
+    <div class="source-tag">
+      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><path d="M14 2v6h6"/></svg>
+      Source: Plan Agent 4-phase process, Compact prompt 9-section template, Commit command workflow
+    </div>
+  </div>
+
+  <!-- T6 -->
+  <div class="technique">
+    <div class="technique-header">
+      <span class="technique-num">06</span>
+      <h3>Graduated Specificity <span class="en">&#183; 分级详细度</span></h3>
+    </div>
+    <p class="explanation">Don't use the same level of detail for simple and complex cases. Claude Code's BashTool gives brief guidance for simple commands and detailed guidance for complex ones. The Explore Agent accepts three thoroughness levels.</p>
+    <div class="code-compare">
+      <div class="code-block weak">Write clear descriptions for all commands.</div>
+      <div class="code-block strong"><span class="cm">Simple commands (5-10 words):</span><br>&bull; ls &rarr; "List files in current directory"<br><br><span class="cm">Complex commands (add context):</span><br>&bull; curl -s url | jq '.data[]' &rarr; "Fetch JSON and extract data array"</div>
+    </div>
+    <div class="source-tag">
+      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><path d="M14 2v6h6"/></svg>
+      Source: BashTool description parameter, Explore Agent thoroughness levels ("quick" / "medium" / "very thorough")
+    </div>
+  </div>
+
+  <!-- T7 -->
+  <div class="technique">
+    <div class="technique-header">
+      <span class="technique-num">07</span>
+      <h3>Economic Reasoning <span class="en">&#183; 经济推理</span></h3>
+    </div>
+    <p class="explanation">"This approach is faster/cheaper" persuades better than "you must." Claude Code's Agent prompt explains "Forks are CHEAP &mdash; they share the parent's prompt cache" rather than mandating fork usage.</p>
+    <div class="code-compare">
+      <div class="code-block weak">Always use the Grep tool instead of bash grep.</div>
+      <div class="code-block strong">The Grep tool is optimized for this environment &mdash; it's faster than bash grep and handles permissions correctly. Use it for all search tasks.</div>
+    </div>
+    <div class="source-tag">
+      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><path d="M14 2v6h6"/></svg>
+      Source: Agent Tool prompt &mdash; "Don't set model on fork &mdash; different model can't reuse parent cache"
+    </div>
+  </div>
+
+  <!-- T8 -->
+  <div class="technique">
+    <div class="technique-header">
+      <span class="technique-num">08</span>
+      <h3>Cache-Aware Structure &amp; Defense in Depth <span class="en">&#183; 缓存结构 &amp; 防御纵深</span></h3>
+    </div>
+    <p class="explanation">Static content first, dynamic content last, separated by a clear boundary &mdash; for prompt caching cost savings. Critical constraints appear both in the constraints section AND inline at the point of action. This redundancy is intentional: different positions in a long prompt receive different attention weight.</p>
+    <div class="code-compare">
+      <div class="code-block weak"><span class="cm">[Mixed: instructions, context, more instructions, more context...]</span></div>
+      <div class="code-block strong"><span class="kw">[STATIC &mdash; cached]</span><br>Identity, constraints, process, examples<br><br><span class="cm">&mdash; CACHE BOUNDARY &mdash;</span><br><br><span class="kw">[DYNAMIC &mdash; per request]</span><br>User context, session state, current data</div>
+    </div>
+    <div class="source-tag">
+      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><path d="M14 2v6h6"/></svg>
+      Source: <code>SYSTEM_PROMPT_DYNAMIC_BOUNDARY</code> in <code>src/constants/prompts.ts</code> line 114
+    </div>
+  </div>
+</div>
+</section>
+
+<!-- ==================== 3 INSIGHTS ==================== -->
+<section>
+<div class="container">
+  <div class="section-header">
+    <div class="section-label">Insights</div>
+    <h2 class="section-title">3 Architectural Insights</h2>
+    <p class="section-subtitle">Beyond individual techniques, three higher-level design principles emerge from the source.</p>
+  </div>
+
+  <div class="grid-3">
+    <div class="insight">
+      <div class="insight-num">1</div>
+      <h3>Prompts Are API Contracts<br><span style="font-weight:400;font-size:0.85rem;color:var(--text-muted)">Prompt 是 API 契约</span></h3>
+      <div class="sep"></div>
+      <p>Claude Code's prompts read like interface documentation &mdash; identity as type definition, MUST/NEVER as contracts, examples as test cases, output templates as return types. Write prompts like specifications, not emails.</p>
+    </div>
+    <div class="insight">
+      <div class="insight-num">2</div>
+      <h3>Defense in Depth<br><span style="font-weight:400;font-size:0.85rem;color:var(--text-muted)">Prompt 层的防御纵深</span></h3>
+      <div class="sep"></div>
+      <p>The same constraint ("don't force push") appears in the system prompt, in BashTool's prompt, AND in code-level validation. Critical rules get stated twice &mdash; once in constraints, once at the point of action. Never trust a single layer.</p>
+    </div>
+    <div class="insight">
+      <div class="insight-num">3</div>
+      <h3>Separation of Concerns<br><span style="font-weight:400;font-size:0.85rem;color:var(--text-muted)">关注点分离</span></h3>
+      <div class="sep"></div>
+      <p>Claude Code separates Context (git status, memory), Capability (tool definitions), and Behavior (system prompt) into independent injection paths. Don't mix "what the AI knows" with "what it can do" with "how it should behave."</p>
+    </div>
+  </div>
+</div>
+</section>
+
+<!-- ==================== SKILLS DEEP DIVE ==================== -->
+<section class="alt">
+<div class="container">
+  <div class="section-header">
+    <div class="section-label">Deep Dive</div>
+    <h2 class="section-title">Skills in Detail</h2>
+  </div>
+
+  <!-- ARCHITECT -->
+  <h3 style="font-size:1.3rem;margin-bottom:0.5rem;">&#128207; prompt-architect</h3>
+  <p style="color:var(--text-muted);margin-bottom:1.5rem;">Build prompts from scratch through guided interview. 3-round discovery, 5 structural patterns, 8 techniques applied systematically.</p>
+
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>Pattern</th><th>Best For</th><th>Key Feature</th></tr></thead>
+      <tbody>
+        <tr><td>Simple Instruction</td><td>Single-step, clear output</td><td>Minimal structure, fast to write</td></tr>
+        <tr><td>Agent Prompt</td><td>Tool-using AI with decisions</td><td>Decision framework + tool routing</td></tr>
+        <tr><td>Pipeline Prompt</td><td>Automated, no human in loop</td><td>Exhaustive rules, exact output schema</td></tr>
+        <tr><td>Persona Prompt</td><td>User-facing chatbots</td><td>Personality traits + conversation examples</td></tr>
+        <tr><td>Cached System Prompt</td><td>High-volume APIs</td><td>Static/dynamic boundary for cost savings</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="sep"></div>
+
+  <!-- FORGE -->
+  <h3 style="font-size:1.3rem;margin-bottom:0.5rem;">&#128296; prompt-forge</h3>
+  <p style="color:var(--text-muted);margin-bottom:1.5rem;">Refine existing prompts using a 4-phase pipeline: Understand &rarr; Diagnose (8 dimensions) &rarr; Rewrite &rarr; Present with rationale.</p>
+
+  <div class="workflow">
+    <span class="wf-step">Understand the job</span>
+    <span class="wf-arrow">&rarr;</span>
+    <span class="wf-step active">Diagnose (8-point)</span>
+    <span class="wf-arrow">&rarr;</span>
+    <span class="wf-step">Apply improvements</span>
+    <span class="wf-arrow">&rarr;</span>
+    <span class="wf-step">Present with rationale</span>
+  </div>
+
+  <div class="sep"></div>
+
+  <!-- JUDGE -->
+  <h3 style="font-size:1.3rem;margin-bottom:0.5rem;">&#127942; prompt-judge</h3>
+  <p style="color:var(--text-muted);margin-bottom:1.5rem;">Quantitative evaluation &mdash; 8 dimensions, each scored 1-5, total 40 points. Every score backed by evidence.</p>
+
+  <div class="grid-2">
+    <div>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>#</th><th>Dimension</th></tr></thead>
+          <tbody>
+            <tr><td>1</td><td>Identity Clarity</td></tr>
+            <tr><td>2</td><td>Constraint Precision</td></tr>
+            <tr><td>3</td><td>Example Quality</td></tr>
+            <tr><td>4</td><td>Failure Mode Coverage</td></tr>
+            <tr><td>5</td><td>Structure &amp; Scannability</td></tr>
+            <tr><td>6</td><td>Output Specification</td></tr>
+            <tr><td>7</td><td>Efficiency</td></tr>
+            <tr><td>8</td><td>Adaptability</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+    <div>
+      <div style="display:flex;flex-direction:column;gap:0.5rem;">
+        <div class="grade-row"><div class="grade-letter grade-s">S</div><div class="grade-info">36-40 <span class="grade-range">&mdash; Production-grade. Ship it.</span></div></div>
+        <div class="grade-row"><div class="grade-letter grade-a">A</div><div class="grade-info">30-35 <span class="grade-range">&mdash; Strong. Minor polish.</span></div></div>
+        <div class="grade-row"><div class="grade-letter grade-b">B</div><div class="grade-info">24-29 <span class="grade-range">&mdash; Solid, clear improvements.</span></div></div>
+        <div class="grade-row"><div class="grade-letter grade-c">C</div><div class="grade-info">18-23 <span class="grade-range">&mdash; Functional but unreliable.</span></div></div>
+        <div class="grade-row"><div class="grade-letter grade-d">D</div><div class="grade-info">12-17 <span class="grade-range">&mdash; Rewrite recommended.</span></div></div>
+        <div class="grade-row"><div class="grade-letter grade-f">F</div><div class="grade-info">&lt;12 <span class="grade-range">&mdash; Start over.</span></div></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="sep"></div>
+
+  <!-- DEBUG -->
+  <h3 style="font-size:1.3rem;margin-bottom:0.5rem;">&#128270; prompt-debug</h3>
+  <p style="color:var(--text-muted);margin-bottom:1.5rem;">Symptom-driven diagnosis. 9 named fault patterns &mdash; each with a signature, root cause, and targeted fix.</p>
+
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>Fault Pattern</th><th>Symptom</th><th>Root Cause</th></tr></thead>
+      <tbody>
+        <tr><td><span class="badge badge-red">Buried Constraint</span></td><td>AI ignores a rule that IS in the prompt</td><td>Rule positioned too late or in prose</td></tr>
+        <tr><td><span class="badge badge-orange">Naked Subjective</span></td><td>Output quality varies wildly</td><td>Subjective terms without examples</td></tr>
+        <tr><td><span class="badge badge-purple">Identity Vacuum</span></td><td>Generic, shallow responses</td><td>No role or capability framing</td></tr>
+        <tr><td><span class="badge badge-blue">No Alternative</span></td><td>Avoids bad thing, does nothing useful</td><td>NEVER without "instead do Y"</td></tr>
+        <tr><td><span class="badge badge-pink">Process Ambiguity</span></td><td>Steps in wrong order or skipped</td><td>Workflow in prose, not numbered</td></tr>
+        <tr><td><span class="badge badge-orange">Format Drift</span></td><td>Output structure varies between runs</td><td>No output template</td></tr>
+        <tr><td><span class="badge badge-green">Tool Blindness</span></td><td>Won't use available tools</td><td>Tool descriptions lack "when to use"</td></tr>
+        <tr><td><span class="badge badge-blue">Context Starvation</span></td><td>Correct but shallow answers</td><td>Dynamic context not injected</td></tr>
+        <tr><td><span class="badge badge-red">Overconstraint</span></td><td>Bland, minimal, "scared" output</td><td>Too many rules or contradictions</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="sep"></div>
+
+  <!-- COMPRESS -->
+  <h3 style="font-size:1.3rem;margin-bottom:0.5rem;">&#128230; prompt-compress</h3>
+  <p style="color:var(--text-muted);margin-bottom:1.5rem;">6-stage compression pipeline targeting 30-50% token reduction.</p>
+
+  <div class="pipeline">
+    <div class="pipe-stage">
+      <div class="pipe-num">Stage 1</div>
+      <div class="pipe-name">Filler Extraction</div>
+      <div class="pipe-save">~40-60%</div>
+    </div>
+    <div class="pipe-stage">
+      <div class="pipe-num">Stage 2</div>
+      <div class="pipe-name">Redundancy Cut</div>
+      <div class="pipe-save">~15-25%</div>
+    </div>
+    <div class="pipe-stage">
+      <div class="pipe-num">Stage 3</div>
+      <div class="pipe-name">Prose &rarr; Structure</div>
+      <div class="pipe-save">~40-50%</div>
+    </div>
+    <div class="pipe-stage">
+      <div class="pipe-num">Stage 4</div>
+      <div class="pipe-name">Example Tighten</div>
+      <div class="pipe-save">~20-35%</div>
+    </div>
+    <div class="pipe-stage">
+      <div class="pipe-num">Stage 5</div>
+      <div class="pipe-name">Abbreviations</div>
+      <div class="pipe-save">~5-10%</div>
+    </div>
+    <div class="pipe-stage">
+      <div class="pipe-num">Stage 6</div>
+      <div class="pipe-name">Cache Boundary</div>
+      <div class="pipe-save">$/request</div>
+    </div>
+  </div>
+  <p style="font-size:0.82rem;color:var(--text-light);margin-top:0.5rem;">* Percentages are per-section savings within that stage, not cumulative total.</p>
+</div>
+</section>
+
+<!-- ==================== INSTALL ==================== -->
+<section>
+<div class="container" style="text-align:center;">
+  <div class="section-header" style="margin-bottom:2rem;">
+    <div class="section-label">Get Started</div>
+    <h2 class="section-title">Install in 10 Seconds</h2>
+  </div>
+
+  <div class="install-box" style="font-size:1rem;padding:0.85rem 1.5rem;">
+    <span class="label">In Claude Code</span>
+    <span>/plugin &rarr; yezhipeng2417/cc-prompt-kit</span>
+  </div>
+
+  <p style="color:var(--text-muted);margin-top:1.5rem;font-size:0.92rem;">Or manual install:</p>
+  <div class="code-block" style="display:inline-block;text-align:left;margin-top:0.5rem;">
+git clone https://github.com/yezhipeng2417/cc-prompt-kit.git ~/.claude/plugins/cc-prompt-kit
+  </div>
+
+  <div style="margin-top:2.5rem;">
+    <div class="workflow">
+      <span class="wf-step"><code>/prompt-architect</code></span>
+      <span class="wf-step"><code>/prompt-forge</code></span>
+      <span class="wf-step"><code>/prompt-judge</code></span>
+      <span class="wf-step"><code>/prompt-debug</code></span>
+      <span class="wf-step"><code>/prompt-compress</code></span>
+    </div>
+  </div>
+</div>
+</section>
+
+<footer>
+  <p><a href="https://github.com/yezhipeng2417/cc-prompt-kit">GitHub</a> &bull; MIT License &bull; Techniques extracted from <a href="https://github.com/instructkr/claude-code">Claude Code source</a></p>
+  <p style="margin-top:0.5rem;">Built by analyzing 512K+ lines of production AI system prompts.</p>
+</footer>
+
+</body>
+</html>
