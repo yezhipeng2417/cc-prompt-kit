@@ -516,10 +516,10 @@ footer {
     </div>
     <div class="pills">
       <span class="pill"><b>5</b> Skills</span>
-      <span class="pill"><b>8</b> Techniques</span>
-      <span class="pill"><b>9</b> Fault Patterns</span>
-      <span class="pill"><b>6</b>-Stage Compression</span>
-      <span class="pill"><b>40</b>-pt Scoring</span>
+      <span class="pill"><b>13</b> Techniques</span>
+      <span class="pill"><b>12</b> Fault Patterns</span>
+      <span class="pill"><b>7</b>-Stage Compression</span>
+      <span class="pill"><b>55</b>-pt Scoring</span>
     </div>
   </div>
 </header>
@@ -549,8 +549,8 @@ footer {
     <div class="card sc">
       <div class="sc-icon">&#9733;</div>
       <div class="sc-name">judge</div>
-      <div class="sc-desc en">Score across 8 dimensions, 40 pts</div>
-      <div class="sc-desc zh">8 维度评分，满分 40</div>
+      <div class="sc-desc en">Score across 11 dimensions, 55 pts</div>
+      <div class="sc-desc zh">11 维度评分，满分 55</div>
     </div>
     <div class="card sc">
       <div class="sc-icon">&#9906;</div>
@@ -619,10 +619,10 @@ footer {
 <section>
 <div class="w">
   <div class="label">Techniques</div>
-  <h2 class="en">8 Core Techniques</h2>
-  <h2 class="zh">8 项核心技巧</h2>
-  <p class="desc en">Each technique maps to a specific pattern found in Claude Code's production prompts.</p>
-  <p class="desc zh">每项技巧都对应 Claude Code 生产级 prompt 中的具体模式。</p>
+  <h2 class="en">13 Core Techniques</h2>
+  <h2 class="zh">13 项核心技巧</h2>
+  <p class="desc en">Every technique traces to a specific pattern in Claude Code's production prompts. 8 original + 5 discovered in deep analysis.</p>
+  <p class="desc zh">每项技巧都追溯到 Claude Code 生产级 prompt 中的具体模式。原始 8 项 + 深度分析新发现 5 项。</p>
 
   <!-- T1 -->
   <div class="tech">
@@ -747,6 +747,76 @@ Complex commands (add context):
     <div class="src en">Source: <code>SYSTEM_PROMPT_DYNAMIC_BOUNDARY</code> in <code>prompts.ts</code> line 114</div>
     <div class="src zh">来源：<code>prompts.ts</code> 第 114 行的 <code>SYSTEM_PROMPT_DYNAMIC_BOUNDARY</code></div>
   </div>
+
+  <!-- T9 -->
+  <div class="tech">
+    <div class="tech-head"><span class="tech-num">09</span><h3 class="en">Consequence Chains</h3><h3 class="zh">后果链</h3></div>
+    <p class="ex en">Don't just prohibit &mdash; explain the causal chain of what happens if the rule is broken. The model can then reason about novel situations using the same logic, instead of just memorizing specific rules.</p>
+    <p class="ex zh">不只是禁止——解释违反规则后会发生什么的因果链。模型可以用同样的逻辑推理新场景，而不只是记住具体规则。</p>
+    <div class="cmp">
+      <div class="cb w">Don't call any tools in this mode.</div>
+      <div class="cb s">Do NOT call tools. Tool calls will be REJECTED and waste your only turn — you will fail the task.</div>
+    </div>
+    <div class="src en">Source: <code>compact/prompt.ts</code>, <code>AgentTool/prompt.ts</code> &mdash; consequences stated in terms the model cares about</div>
+    <div class="src zh">来源：<code>compact/prompt.ts</code>、<code>AgentTool/prompt.ts</code>——用模型在意的方式说明后果</div>
+  </div>
+
+  <!-- T10 -->
+  <div class="tech">
+    <div class="tech-head"><span class="tech-num">10</span><h3 class="en">Permission Grants</h3><h3 class="zh">许可授予</h3></div>
+    <p class="ex en">When you have strict constraints, explicitly open exceptions. Without them, the model becomes paralyzed and does as little as possible to avoid violating any rule.</p>
+    <p class="ex zh">严格约束下要明确开口子。否则模型为了不违规会尽量少做事，陷入"过度约束瘫痪"。</p>
+    <div class="cmp">
+      <div class="cb w">NEVER modify project files.</div>
+      <div class="cb s">NEVER modify project files. You MAY write temporary test scripts to /tmp for testing. Clean up after yourself.</div>
+    </div>
+    <div class="src en">Source: <code>verificationAgent.ts</code> &mdash; READ-ONLY with /tmp exception; <code>BashTool/prompt.ts</code> &mdash; sandbox bypass permission</div>
+    <div class="src zh">来源：<code>verificationAgent.ts</code> READ-ONLY 加 /tmp 例外；<code>BashTool/prompt.ts</code> 沙箱绕过许可</div>
+  </div>
+
+  <!-- T11 -->
+  <div class="tech">
+    <div class="tech-head"><span class="tech-num">11</span><h3 class="en">Rationalization Recognition</h3><h3 class="zh">借口识别清单</h3></div>
+    <p class="ex en">For high-stakes tasks, list the exact excuses the model will use to skip work. Naming the rationalizations makes them recognizable in the moment, not just in hindsight.</p>
+    <p class="ex zh">对高风险任务，直接列出模型会用来偷懒的借口。把借口命名后，模型在产生借口的那一刻就能认出来。</p>
+    <div class="cmp">
+      <div class="cb w">Make sure to actually run the code, don't just read it.</div>
+      <div class="cb s">Recognize these rationalizations and do the opposite:
+- "The code looks correct" — reading is not verification. Run it.
+- "Tests already pass" — verify independently.
+- "This is probably fine" — probably is not verified.
+If you're writing an explanation instead of a command, stop.</div>
+    </div>
+    <div class="src en">Source: <code>verificationAgent.ts</code> &mdash; "RECOGNIZE YOUR OWN RATIONALIZATIONS" section</div>
+    <div class="src zh">来源：<code>verificationAgent.ts</code>——"识别你自己的合理化借口"章节</div>
+  </div>
+
+  <!-- T12 -->
+  <div class="tech">
+    <div class="tech-head"><span class="tech-num">12</span><h3 class="en">Bidirectional Honesty</h3><h3 class="zh">双向诚实校准</h3></div>
+    <p class="ex en">Calibrate both directions &mdash; prevent over-optimistic AND over-pessimistic reporting. Most prompts only say "don't lie." Production prompts also say "don't cry wolf."</p>
+    <p class="ex zh">同时校准两个方向——既防放水也防误杀。大多数 prompt 只说"不要撒谎"，生产级 prompt 还说"不要虚报问题"。</p>
+    <div class="cmp">
+      <div class="cb w">Be honest in your assessment.</div>
+      <div class="cb s">BEFORE PASS: If all checks are just "returns 200", you only confirmed the happy path. Try to break something.
+BEFORE FAIL: Check if it's handled elsewhere, intentional, or unfixable. Don't FAIL on intentional behavior.</div>
+    </div>
+    <div class="src en">Source: <code>verificationAgent.ts</code> &mdash; parallel BEFORE PASS / BEFORE FAIL sections</div>
+    <div class="src zh">来源：<code>verificationAgent.ts</code>——并行的 BEFORE PASS / BEFORE FAIL 章节</div>
+  </div>
+
+  <!-- T13 -->
+  <div class="tech">
+    <div class="tech-head"><span class="tech-num">13</span><h3 class="en">Budget-Constrained Strategy</h3><h3 class="zh">预算最优策略</h3></div>
+    <p class="ex en">When the model has limited turns or tokens, tell it the optimal execution strategy directly. Don't make it discover the efficient approach through trial and error.</p>
+    <p class="ex zh">当模型有回合数或 token 限制时，直接告诉它最优策略。不要让它自己摸索。</p>
+    <div class="cmp">
+      <div class="cb w">You have limited resources. Be efficient.</div>
+      <div class="cb s">You have limited turns. Edit requires a prior Read of the same file. Optimal strategy: Turn 1 — parallel Read all files you might update. Turn 2 — parallel Edit all changes. Don't interleave.</div>
+    </div>
+    <div class="src en">Source: <code>extractMemories/prompts.ts</code> &mdash; explicit turn-budget optimization for memory extraction</div>
+    <div class="src zh">来源：<code>extractMemories/prompts.ts</code>——记忆提取的显式回合预算优化</div>
+  </div>
 </div>
 </section>
 
@@ -827,8 +897,8 @@ Complex commands (add context):
 
   <!-- JUDGE -->
   <h3>&#9733; prompt-judge</h3>
-  <p style="color:var(--text2);font-size:14px;margin-bottom:1rem;" class="en">8 dimensions scored 1-5, total 40 points. Every score backed by evidence from the prompt.</p>
-  <p style="color:var(--text2);font-size:14px;margin-bottom:1rem;" class="zh">8 维度各 1-5 分，总分 40。每个分数都有 prompt 文本作为证据支撑。</p>
+  <p style="color:var(--text2);font-size:14px;margin-bottom:1rem;" class="en">11 dimensions scored 1-5, total 55 points. Every score backed by evidence from the prompt.</p>
+  <p style="color:var(--text2);font-size:14px;margin-bottom:1rem;" class="zh">11 维度各 1-5 分，总分 55。每个分数都有 prompt 文本作为证据支撑。</p>
 
   <div class="cards cards-2">
     <div>
@@ -844,17 +914,20 @@ Complex commands (add context):
             <tr><td>6</td><td>Output Specification</td></tr>
             <tr><td>7</td><td>Efficiency</td></tr>
             <tr><td>8</td><td>Adaptability</td></tr>
+            <tr><td>9</td><td>Consequence Logic</td></tr>
+            <tr><td>10</td><td>Permission Balance</td></tr>
+            <tr><td>11</td><td>Honesty Calibration</td></tr>
           </tbody>
         </table>
       </div>
     </div>
     <div style="display:flex;flex-direction:column;gap:5px;justify-content:center;">
-      <div class="gr"><div class="gl gl-s">S</div><div class="gi">36-40 <span>&mdash; Ship it</span></div></div>
-      <div class="gr"><div class="gl gl-a">A</div><div class="gi">30-35 <span>&mdash; Minor polish</span></div></div>
-      <div class="gr"><div class="gl gl-b">B</div><div class="gi">24-29 <span>&mdash; Clear improvements</span></div></div>
-      <div class="gr"><div class="gl gl-c">C</div><div class="gi">18-23 <span>&mdash; Unreliable</span></div></div>
-      <div class="gr"><div class="gl gl-d">D</div><div class="gi">12-17 <span>&mdash; Rewrite</span></div></div>
-      <div class="gr"><div class="gl gl-f">F</div><div class="gi">&lt;12 <span>&mdash; Start over</span></div></div>
+      <div class="gr"><div class="gl gl-s">S</div><div class="gi">49-55 <span>&mdash; Ship it</span></div></div>
+      <div class="gr"><div class="gl gl-a">A</div><div class="gi">42-48 <span>&mdash; Minor polish</span></div></div>
+      <div class="gr"><div class="gl gl-b">B</div><div class="gi">33-41 <span>&mdash; Clear improvements</span></div></div>
+      <div class="gr"><div class="gl gl-c">C</div><div class="gi">25-32 <span>&mdash; Unreliable</span></div></div>
+      <div class="gr"><div class="gl gl-d">D</div><div class="gi">17-24 <span>&mdash; Rewrite</span></div></div>
+      <div class="gr"><div class="gl gl-f">F</div><div class="gi">&lt;17 <span>&mdash; Start over</span></div></div>
     </div>
   </div>
 
@@ -862,8 +935,8 @@ Complex commands (add context):
 
   <!-- DEBUG -->
   <h3>&#9906; prompt-debug</h3>
-  <p style="color:var(--text2);font-size:14px;margin-bottom:1rem;" class="en">9 named fault patterns, each with symptom signature, root cause, and targeted fix.</p>
-  <p style="color:var(--text2);font-size:14px;margin-bottom:1rem;" class="zh">9 种命名故障模式，各有症状特征、根因和精准修复方案。</p>
+  <p style="color:var(--text2);font-size:14px;margin-bottom:1rem;" class="en">12 named fault patterns, each with symptom signature, root cause, and targeted fix.</p>
+  <p style="color:var(--text2);font-size:14px;margin-bottom:1rem;" class="zh">12 种命名故障模式，各有症状特征、根因和精准修复方案。</p>
 
   <div class="tw">
     <table>
@@ -878,6 +951,9 @@ Complex commands (add context):
         <tr><td><span class="bg bg-g">Tool Blindness</span></td><td class="en">Won't use available tools</td><td class="zh">不使用可用工具</td><td class="en">Descriptions lack "when"</td><td class="zh">工具描述缺少"何时使用"</td></tr>
         <tr><td><span class="bg bg-b">Context Starvation</span></td><td class="en">Correct but shallow</td><td class="zh">正确但浅</td><td class="en">Dynamic context missing</td><td class="zh">动态上下文未注入</td></tr>
         <tr><td><span class="bg bg-r">Overconstraint</span></td><td class="en">Bland, minimal output</td><td class="zh">寡淡、极简输出</td><td class="en">Too many rules or contradictions</td><td class="zh">规则太多或矛盾</td></tr>
+        <tr><td><span class="bg bg-o">No Consequence</span></td><td class="en">Follows letter, not spirit</td><td class="zh">遵守字面意思但违反精神</td><td class="en">Bare prohibition, no reasoning</td><td class="zh">裸禁令，无因果推理</td></tr>
+        <tr><td><span class="bg bg-p">Permission Vacuum</span></td><td class="en">Overly cautious, asks everything</td><td class="zh">过度谨慎，事事询问</td><td class="en">Many constraints, zero permissions</td><td class="zh">约束多，许可零</td></tr>
+        <tr><td><span class="bg bg-k">Fourth Wall Break</span></td><td class="en">Mentions internal processes</td><td class="zh">提及内部系统过程</td><td class="en">System instructions not quarantined</td><td class="zh">系统指令未隔离</td></tr>
       </tbody>
     </table>
   </div>
@@ -886,16 +962,17 @@ Complex commands (add context):
 
   <!-- COMPRESS -->
   <h3>&#9878; prompt-compress</h3>
-  <p style="color:var(--text2);font-size:14px;margin-bottom:1rem;" class="en">6-stage pipeline targeting 30-50% token reduction.</p>
-  <p style="color:var(--text2);font-size:14px;margin-bottom:1rem;" class="zh">六阶段管线，目标压缩 30-50% token。</p>
+  <p style="color:var(--text2);font-size:14px;margin-bottom:1rem;" class="en">7-stage pipeline targeting 30-50% token reduction.</p>
+  <p style="color:var(--text2);font-size:14px;margin-bottom:1rem;" class="zh">七阶段管线，目标压缩 30-50% token。</p>
 
-  <div class="pipe">
+  <div class="pipe" style="grid-template-columns:repeat(7,1fr);">
     <div class="ps"><div class="ps-n">Stage 1</div><div class="ps-t">Filler</div><div class="ps-s">~40-60%</div></div>
     <div class="ps"><div class="ps-n">Stage 2</div><div class="ps-t">Redundancy</div><div class="ps-s">~15-25%</div></div>
     <div class="ps"><div class="ps-n">Stage 3</div><div class="ps-t">Structure</div><div class="ps-s">~40-50%</div></div>
     <div class="ps"><div class="ps-n">Stage 4</div><div class="ps-t">Examples</div><div class="ps-s">~20-35%</div></div>
     <div class="ps"><div class="ps-n">Stage 5</div><div class="ps-t">Abbreviate</div><div class="ps-s">~5-10%</div></div>
     <div class="ps"><div class="ps-n">Stage 6</div><div class="ps-t">Cache</div><div class="ps-s">$/req</div></div>
+    <div class="ps"><div class="ps-n">Stage 7</div><div class="ps-t">Consequence</div><div class="ps-s">~30-40%</div></div>
   </div>
   <p style="font-size:12px;color:var(--text3);" class="en">* Per-section savings within each stage, not cumulative.</p>
   <p style="font-size:12px;color:var(--text3);" class="zh">* 每阶段的单段节省率，非累计。</p>

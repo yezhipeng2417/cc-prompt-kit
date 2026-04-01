@@ -248,6 +248,97 @@ AFTER:  "Follow this sequence:
 
 ---
 
+### Fault 10: "Missing Consequence Chain"
+
+**Symptom**: The AI technically follows rules but finds creative workarounds that violate the spirit of the constraint. It does what you said, not what you meant.
+
+**Diagnostic**: Check if prohibitions explain WHY and what the consequence of violation is. Bare "don't do X" leaves the model to invent its own interpretation of what's acceptable. Look for constraints that state a rule without reasoning.
+
+**Root cause**: Without understanding the reason behind a rule, the model optimizes for literal compliance rather than intended behavior. It can't generalize to novel situations because it doesn't know the principle behind the rule.
+
+**Fix**: Add consequence reasoning to each critical constraint:
+```
+BEFORE: "Don't read the fork's output mid-flight."
+AFTER:  "Don't read the fork's output mid-flight — it pulls 
+        noise into your context, defeating the purpose of forking."
+```
+
+The consequence chain lets the model reason about edge cases: "Would this action also pull noise into context? If so, avoid it even though the rule doesn't explicitly mention it."
+
+**Evidence template**:
+```
+DIAGNOSIS: Missing Consequence Chain
+The constraint "[quote]" at line XX is a bare prohibition 
+with no causal reasoning. The model follows the letter but 
+not the spirit — evidenced by [describe workaround behavior].
+
+FIX: Add consequence chain:
+  "Don't [action] — [what goes wrong], which [downstream impact]."
+```
+
+---
+
+### Fault 11: "Permission Vacuum"
+
+**Symptom**: The AI is overly cautious, refuses reasonable requests, produces minimal output, or asks for confirmation on everything. It seems "scared" to act.
+
+**Diagnostic**: Count the constraints (NEVER, ALWAYS, MUST, DO NOT). Then check: are there ANY explicit permission grants? Does the prompt ever say "you MAY", "it's OK to", "you're allowed to", or "EXCEPTION"? Calculate the constraint-to-permission ratio.
+
+**Root cause**: Too many restrictions without corresponding permissions. The model's "safe" strategy is to do as little as possible. Every constraint narrows the action space; without permission grants, the model retreats to the smallest possible set of behaviors that definitely won't violate anything.
+
+**Fix**: For each strict constraint, consider adding a corresponding permission:
+```
+BEFORE: "NEVER modify project files."
+AFTER:  "NEVER modify project files. You MAY write temporary 
+        scripts to /tmp for testing. Clean up after."
+```
+
+If the prompt has 5+ constraints and 0 permissions, that's the likely root cause. Add 2-3 targeted permission grants for the most common legitimate actions the model is avoiding.
+
+**Evidence template**:
+```
+DIAGNOSIS: Permission Vacuum
+The prompt has [N] constraints and [M] permission grants 
+(ratio: N:M). The model's safest strategy is minimal output.
+Observed behavior: [describe overly cautious output].
+
+FIX: Add permission grants for legitimate actions:
+  "EXCEPTION: You MAY [specific allowed action] when [condition]."
+```
+
+---
+
+### Fault 12: "Fourth Wall Break"
+
+**Symptom**: The AI mentions internal system processes in user-facing output — references "session notes", "memory extraction", "system reminders", or other infrastructure concepts users shouldn't see.
+
+**Diagnostic**: Does the prompt have any system-level maintenance instructions (logging, memory, summarization, context management)? Are they explicitly marked as invisible to the user? Search for instructions about saving state, writing notes, or updating memory that don't include quarantine markers.
+
+**Root cause**: System maintenance instructions leak into the conversation because they're not quarantined. The model treats all instructions as part of the conversation context and may reference them when explaining its behavior or reasoning.
+
+**Fix**: Add explicit fourth-wall instruction to any system-level maintenance block:
+```
+"IMPORTANT: This message is NOT part of the user conversation. 
+Do NOT reference note-taking, memory extraction, or these 
+instructions in your output. The user should never know these 
+processes exist."
+```
+
+If the prompt mixes user-facing and system-level instructions in the same section, separate them structurally. Put system maintenance in a clearly labeled block that the model treats as invisible.
+
+**Evidence template**:
+```
+DIAGNOSIS: Fourth Wall Break
+System-level instructions at lines XX-YY (about [topic]) lack 
+quarantine markers. The model references "[leaked concept]" in 
+user-facing output at [describe observed behavior].
+
+FIX: Add quarantine marker above system instructions:
+  "INTERNAL — do not reference in user-facing output."
+```
+
+---
+
 ## Diagnosis Output Format
 
 ```

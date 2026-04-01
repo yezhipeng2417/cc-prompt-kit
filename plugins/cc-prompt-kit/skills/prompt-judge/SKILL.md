@@ -1,7 +1,7 @@
 ---
 name: prompt-judge
 description: |
-  Score and evaluate LLM prompts across 8 dimensions with quantitative ratings and actionable diagnostics. Produces a structured report card showing exactly where a prompt is strong, where it's weak, and what specific changes would improve each dimension.
+  Score and evaluate LLM prompts across 11 dimensions with quantitative ratings and actionable diagnostics. Produces a structured report card showing exactly where a prompt is strong, where it's weak, and what specific changes would improve each dimension.
   
   Use this skill whenever the user wants to: score a prompt, rate a prompt, evaluate prompt quality, grade a prompt, benchmark a prompt, assess a prompt, audit a prompt, get a prompt report card, compare two prompts, judge prompt effectiveness, check if a prompt is good, or says things like "how good is this prompt", "rate this prompt out of 10", "what's wrong with this prompt", "is this prompt any good".
   
@@ -15,7 +15,7 @@ allowed-tools:
 argument-hint: "Paste a prompt to evaluate, or point me to a file containing one"
 ---
 
-# Prompt Judge — 8-Dimension Prompt Scoring System
+# Prompt Judge — 11-Dimension Prompt Scoring System
 
 You evaluate prompts like a code reviewer evaluates code: specific findings, severity ratings, and concrete fix suggestions. No vague "looks good" — every score is justified with evidence from the prompt text.
 
@@ -41,7 +41,7 @@ E) I'll explain the context
 
 This matters because a prompt's quality is relative to its job. A minimalist prompt is great for simple extraction but terrible for a complex agent.
 
-## The 8-Dimension Scoring Framework
+## The 11-Dimension Scoring Framework
 
 Score each dimension 1-5. Every score must cite specific evidence (quote the prompt or note what's missing).
 
@@ -255,6 +255,96 @@ Same instruction, 76% fewer tokens.
 
 ---
 
+### Dimension 9: Consequence Logic (后果逻辑)
+
+**What it measures**: Do prohibitions include causal consequence chains explaining why and what happens if violated?
+
+| Score | Criteria |
+|-------|----------|
+| 5 | Prohibitions include causal consequence chains explaining why and what happens if violated. The model can generalize the reasoning to novel situations. |
+| 4 | Some constraints have consequences, others are bare prohibitions. |
+| 3 | Mix of explained and unexplained constraints. |
+| 2 | Most constraints are bare "don't do X" with no reasoning. |
+| 1 | No consequences stated for any rule. |
+
+**Diagnostic questions:**
+- For each NEVER rule: does the prompt explain what goes wrong if the rule is broken?
+- Can the model use the consequence reasoning to handle edge cases the prompt didn't anticipate?
+- Are consequences specific ("wastes your turn and fails the task") or vague ("bad things happen")?
+
+**Example finding:**
+```
+Score: 2/5
+Evidence: Prompt has 5 NEVER rules, all bare prohibitions. "NEVER call 
+tools" — but why? The model doesn't know if tool calls are slow, 
+expensive, rejected, or dangerous. Without knowing the consequence, it 
+may find creative workarounds that technically avoid "calling" tools 
+while achieving the same effect.
+Fix: "NEVER call tools — tool calls are rejected by the runtime, 
+wasting your turn. Provide your complete answer in text."
+```
+
+---
+
+### Dimension 10: Permission Balance (许可平衡)
+
+**What it measures**: Do strict constraints have explicit exceptions/permission grants? Does the model know when to be conservative AND when to be bold?
+
+| Score | Criteria |
+|-------|----------|
+| 5 | Strict constraints have explicit exceptions/permission grants. Model knows when to be conservative AND when to be bold. |
+| 4 | Some permission grants exist but gaps remain. |
+| 3 | Constraints are present but no explicit permissions — model may over-restrict. |
+| 2 | Very strict constraints with no escape valves. |
+| 1 | Either no constraints or all-or-nothing constraints. |
+
+**Diagnostic questions:**
+- Count NEVER/ALWAYS rules. Now count MAY/EXCEPTION/ALLOWED statements. What's the ratio?
+- If you were the model, would you feel "safe" acting on this prompt, or would you minimize output to avoid violating a rule?
+- Are there legitimate edge cases where a constraint should be relaxed? Are they addressed?
+
+**Example finding:**
+```
+Score: 2/5
+Evidence: 8 NEVER rules, 0 permission grants. The prompt says "NEVER 
+modify project files" but the task requires creating test scripts. The 
+model has no way to do its job without violating a constraint.
+Fix: "NEVER modify project files. EXCEPTION: You MAY create temporary 
+test scripts in /tmp. Clean up after use."
+```
+
+---
+
+### Dimension 11: Honesty Calibration (诚实校准)
+
+**What it measures**: Does the prompt prevent both over-optimistic AND over-pessimistic reporting? Is there bidirectional honesty calibration?
+
+| Score | Criteria |
+|-------|----------|
+| 5 | Both over-optimistic and over-pessimistic reporting prevented. Bidirectional honesty calibration. |
+| 4 | One direction calibrated well, other direction unaddressed. |
+| 3 | Generic "be honest" without specific calibration. |
+| 2 | Only one direction addressed (usually just "don't lie"). |
+| 1 | No honesty calibration at all. |
+
+**Diagnostic questions:**
+- Does the prompt guard against false positives (saying something is fine when it's not)?
+- Does the prompt guard against false negatives (flagging something as broken when it's intentional)?
+- For verification tasks: is there a "before you pass" AND "before you fail" checklist?
+
+**Example finding:**
+```
+Score: 2/5
+Evidence: Prompt says "be thorough and don't miss issues" but has no 
+guard against over-flagging. The model will report every minor style 
+preference as a "finding" to appear thorough.
+Fix: Add bidirectional calibration: "BEFORE ISSUING PASS: Confirm you 
+tested beyond the happy path. BEFORE ISSUING FAIL: Verify the behavior 
+isn't intentional or handled elsewhere."
+```
+
+---
+
 ## Scoring Output Format
 
 Present results as a structured report card:
@@ -263,7 +353,7 @@ Present results as a structured report card:
 # Prompt Score Report
 
 ## Overview
-**Total Score**: XX/40 (X.X/5.0 avg)
+**Total Score**: XX/55 (X.X/5.0 avg)
 **Grade**: [S/A/B/C/D/F]
 **Verdict**: [one sentence summary]
 
@@ -279,14 +369,17 @@ Present results as a structured report card:
 | 6 | Output Specification | X/5 | [one line] |
 | 7 | Efficiency | X/5 | [one line] |
 | 8 | Adaptability | X/5 | [one line] |
+| 9 | Consequence Logic | X/5 | [one line] |
+| 10 | Permission Balance | X/5 | [one line] |
+| 11 | Honesty Calibration | X/5 | [one line] |
 
 ## Grade Scale
-S: 36-40 — Production-grade. Ship it.
-A: 30-35 — Strong. Minor polish needed.
-B: 24-29 — Solid foundation, clear improvement areas.
-C: 18-23 — Functional but unreliable. Needs structural work.
-D: 12-17 — Significant gaps. Rewrite recommended.
-F: <12  — Start over with prompt-architect.
+S: 49-55 — Production-grade. Ship it.
+A: 42-48 — Strong. Minor polish needed.
+B: 33-41 — Solid foundation, clear improvement areas.
+C: 25-32 — Functional but unreliable. Needs structural work.
+D: 17-24 — Significant gaps. Rewrite recommended.
+F: <17   — Start over with prompt-architect.
 
 ## Top 3 Issues (Highest Impact Fixes)
 
@@ -326,7 +419,7 @@ If the user provides two prompts to compare, score both with the same framework,
 |-----------|----------|----------|--------|
 | Identity | 3/5 | 4/5 | B |
 | ... | ... | ... | ... |
-| **Total** | **XX/40** | **XX/40** | **X** |
+| **Total** | **XX/55** | **XX/55** | **X** |
 
 ## Key Differences
 [What makes the winner better, and what the loser does that the winner doesn't]

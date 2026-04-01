@@ -154,6 +154,15 @@ Use when: End users interact directly, personality and tone matter.
 ```
 Use when: The prompt is called thousands of times, cost optimization matters. Static content above the boundary gets cached by the API, reducing token costs.
 
+#### Pattern F: Hidden Chain-of-Thought Prompt
+For tasks needing high-quality output from a constrained format:
+```
+Think through your analysis in <analysis> tags first.
+Then provide your final answer in <output> tags.
+[System strips <analysis> before displaying to user]
+```
+Use when: Output quality matters but you don't want the reasoning visible. The model gets the benefit of step-by-step thinking while the user sees only the polished result. Requires your application layer to strip the analysis tags before display.
+
 Tell the user which pattern you're using and why. If there's a close call between two patterns, ask:
 
 ```
@@ -282,6 +291,72 @@ file (reminder: source file must remain untouched).
 ```
 
 This redundancy is intentional. Different parts of a long prompt receive different attention weight. Critical rules repeated at the point of action are far more likely to be followed.
+
+#### Technique 9: Consequence Chains
+Don't just prohibit — explain the causal chain of what happens if the rule is violated. The model can then reason about novel situations using the same causal logic.
+
+```
+Weak:   "Don't call tools in this mode."
+Strong: "Tool calls will be REJECTED and waste your only turn — 
+        you will fail the task."
+```
+
+A bare prohibition ("Don't do X") is cheap but fragile. A consequence chain ("If you do X, then Y happens, which means Z") is more tokens but dramatically more robust — the model generalizes the reasoning to situations you didn't anticipate.
+
+#### Technique 10: Permission Grants
+When your prompt has strict constraints, explicitly open exceptions. Without them, the model becomes paralyzed — its safest strategy is to do as little as possible.
+
+```
+"You are READ-ONLY. You CANNOT modify files. 
+EXCEPTION: You MAY write temporary test scripts to /tmp. 
+Clean up after."
+
+"Keep responses brief. 
+EXCEPTION: When the question requires a detailed technical 
+explanation, be thorough."
+```
+
+For every hard constraint, ask: "Is there a legitimate case where this should be broken?" If yes, grant explicit permission for that case.
+
+#### Technique 11: Rationalization Recognition
+For high-stakes tasks (verification, security review, data validation), list the specific excuses the model will use to skip work:
+
+```
+"You will feel the urge to skip checks. Recognize these 
+rationalizations:
+- 'The code looks correct' — reading is not verification.
+- 'Tests already pass' — verify independently.
+If you catch yourself writing an explanation instead of a 
+command, stop. Run the command."
+```
+
+Name the rationalizations explicitly. This forces the model to notice when it's taking a shortcut rather than doing the actual work.
+
+#### Technique 12: Bidirectional Honesty
+Calibrate both directions — prevent over-optimistic AND over-pessimistic reporting:
+
+```
+"BEFORE ISSUING PASS: If all your checks are 'returns 200', 
+you only confirmed the happy path. Go try to break something."
+
+"BEFORE ISSUING FAIL: Check if it's actually handled elsewhere, 
+intentional, or unfixable. Don't FAIL on intentional behavior."
+```
+
+Most prompts only calibrate one direction ("be honest" = "don't be too positive"). But over-cautious models that flag everything as broken are equally unhelpful. Calibrate both ends.
+
+#### Technique 13: Budget-Constrained Strategy
+When the model has limited turns or tokens, tell it the optimal strategy directly rather than hoping it figures it out:
+
+```
+"You have limited turns. Edit requires a prior Read. 
+Optimal strategy: 
+  Turn 1 — parallel Read all files you might update. 
+  Turn 2 — parallel Edit all changes. 
+Don't interleave reads and writes."
+```
+
+Without explicit strategy guidance, the model will use turns inefficiently — reading one file, editing it, reading the next, editing it. Tell it the winning pattern upfront.
 
 ### Phase 4: Inspection (Review and Handoff)
 

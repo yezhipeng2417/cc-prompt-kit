@@ -190,6 +190,32 @@ Report: "Moving X tokens above the cache boundary saves ~Y tokens per request at
 
 If this isn't a system prompt or the user doesn't use prompt caching, skip this stage and note: "Cache optimization not applicable for this use case."
 
+### Stage 7: Consequence Chain Compression
+
+Constraints that use the consequence chain pattern (action -> consequence -> why you should care) are HIGH-VALUE tokens. They dramatically improve compliance compared to bare prohibitions. But the chain itself can sometimes be tightened without losing the causal reasoning.
+
+```
+BEFORE (28 tokens):
+"Do not call any tools. If you call a tool, the call will be 
+rejected by the system, and you will have wasted your only 
+available turn, which means you will fail the task entirely."
+
+AFTER (17 tokens):
+"Do NOT call tools. Tool calls are rejected — you waste your 
+only turn and fail the task."
+
+Savings: 11 tokens (39%)
+```
+
+**Rules for consequence compression:**
+- Keep the full causal chain (action -> consequence -> impact) — that's the high-value part
+- Remove redundant words within the chain ("by the system", "entirely", "available")
+- Merge clauses that say the same thing differently
+- NEVER remove the consequence itself — a bare prohibition ("Don't call tools.") is cheaper but dramatically less effective. The consequence tokens are the highest-ROI tokens in any constraint
+- Test after compression: does the chain still explain WHY the rule exists? If not, you cut too much
+
+**Detection method**: Search for constraints with more than one sentence. If the second sentence starts with "If you", "This is because", "The reason is", or "Otherwise" — it's a consequence chain. Compress it, don't delete it.
+
 ## Compression Report Format
 
 ```
@@ -212,6 +238,7 @@ If this isn't a system prompt or the user doesn't use prompt caching, skip this 
 | 4. Example Tightening | XX | XX% |
 | 5. Abbreviations | XX | XX% |
 | 6. Cache Optimization | XX/request | — |
+| 7. Consequence Compression | XX | XX% |
 
 ## Compressed Prompt
 [The full compressed prompt, ready to use]

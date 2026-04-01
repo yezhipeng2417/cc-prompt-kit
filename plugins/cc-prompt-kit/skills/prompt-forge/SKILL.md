@@ -204,6 +204,20 @@ If this prompt will be used as a system prompt with prompt caching, structure ma
 
 Everything above the boundary gets cached and reused. Everything below is recomputed each time. Moving stable content above the boundary can reduce costs significantly.
 
+### Advanced Diagnostic Checks
+
+After evaluating the 8 core dimensions, check for these higher-order issues:
+
+9. **Consequence Chains**: Do prohibitions explain WHY, with causal consequences? Or just "don't do X"? A bare prohibition is fragile — the model may find creative workarounds that technically comply but violate the spirit. Add consequence reasoning: "Don't do X because Y happens, which causes Z."
+
+10. **Permission Grants**: Are there strict constraints without escape hatches? Count the NEVER/ALWAYS rules, then check: does the prompt ever say "you MAY" or "EXCEPTION"? Too many restrictions without corresponding permissions cause the model to produce minimal, overly cautious output. For each hard constraint, ask whether a legitimate exception exists and grant it explicitly.
+
+11. **Fourth Wall Integrity**: If the prompt has system-level instructions (logging, memory management, background tasks), are they isolated from user-facing output? Check for markers like "this message is not part of the conversation." Without explicit quarantine, system maintenance instructions leak into the conversation — the model mentions "session notes" or "memory extraction" to the user.
+
+12. **Rationalization Prevention**: For verification/quality tasks, does the prompt anticipate and name the model's likely shortcuts? Models are prone to "Verification Theater" — reading code and declaring it correct without running it. The prompt should list specific rationalizations ("'The code looks correct' is not verification — run the command") to force genuine work.
+
+13. **Scope Matching**: Does the prompt distinguish one-time permissions from standing authorizations? "You may create a test file" could mean "once, right now" or "whenever you need to." Ambiguous scope leads to either under-use (model asks every time) or over-use (model creates files freely). Be explicit: "For this task only" vs. "Whenever you need to during this session."
+
 ### Phase 3: Apply Improvements
 
 After diagnosis, rewrite the prompt. Follow these principles:
