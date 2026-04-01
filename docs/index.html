@@ -64,7 +64,7 @@ h1, h2, h3, h4 { letter-spacing: -0.01em; }
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  padding: 8px 18px;
+  padding: 0.55rem 1.2rem;
   border-radius: 8px;
   border: 1px solid var(--border);
   background: var(--bg);
@@ -82,6 +82,17 @@ h1, h2, h3, h4 { letter-spacing: -0.01em; }
   color: var(--accent);
 }
 .star-btn svg { flex-shrink: 0; }
+
+.hero-actions {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-bottom: 1.5rem;
+}
+.hero-actions .install { margin-bottom: 0; }
+.hero-actions .star-btn { margin-bottom: 0; }
 
 body.zh .en { display: none; }
 body.zh .zh { display: block; }
@@ -110,7 +121,9 @@ header p.tagline {
 }
 
 .install {
-  display: inline-block;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
   background: var(--code-bg);
   border: 1px solid var(--border);
   border-radius: 8px;
@@ -119,6 +132,7 @@ header p.tagline {
   font-size: 0.88rem;
   color: var(--text);
   margin-bottom: 2rem;
+  white-space: nowrap;
 }
 
 .pills {
@@ -466,11 +480,13 @@ footer {
     <h1>cc-prompt-kit</h1>
     <p class="tagline en">A prompt engineering toolkit built on techniques extracted from Claude Code's internal prompt architecture.</p>
     <p class="tagline zh">基于 Claude Code 内部 prompt 架构分析提炼的 prompt 工程工具包。</p>
-    <div class="install">/plugin &rarr; louisyeaaah/cc-prompt-kit</div>
-    <a class="star-btn" href="https://github.com/louisyeaaah/cc-prompt-kit" target="_blank">
-      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
-      <span class="en">Star on GitHub</span><span class="zh">GitHub 上点个星</span>
-    </a>
+    <div class="hero-actions">
+      <div class="install">/plugin<span class="install-sep">&rarr;</span>louisyeaaah/cc-prompt-kit</div>
+      <a class="star-btn" href="https://github.com/louisyeaaah/cc-prompt-kit" target="_blank">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+        <span class="en">Star on GitHub</span><span class="zh">GitHub 上点个星</span>
+      </a>
+    </div>
     <div class="pills">
       <span class="pill"><b>5</b> Skills</span>
       <span class="pill"><b>8</b> Techniques</span>
@@ -866,9 +882,9 @@ Complex commands (add context):
   <h2 class="en">Install in 10 seconds</h2>
   <h2 class="zh">10 秒安装</h2>
   <br>
-  <div class="install" style="font-size:1rem;padding:0.7rem 1.5rem;">/plugin &rarr; louisyeaaah/cc-prompt-kit</div>
-  <div style="margin-top:1rem;">
-    <a class="star-btn" href="https://github.com/louisyeaaah/cc-prompt-kit" target="_blank">
+  <div class="hero-actions">
+    <div class="install" style="font-size:1rem;padding:0.7rem 1.5rem;">/plugin<span class="install-sep">&rarr;</span>louisyeaaah/cc-prompt-kit</div>
+    <a class="star-btn" href="https://github.com/louisyeaaah/cc-prompt-kit" target="_blank" style="margin-bottom:0;">
       <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
       <span class="en">Star on GitHub</span><span class="zh">GitHub 上点个星</span>
     </a>
