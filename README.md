@@ -32,16 +32,10 @@ prompt-architect ──→ prompt-forge ──→ prompt-judge
 In Claude Code, run:
 
 ```
-/plugin
+/plugin marketplace add louisyeaaah/cc-prompt-kit
 ```
 
-Then enter the marketplace source:
-
-```
-louisyeaaah/cc-prompt-kit
-```
-
-Select `cc-prompt-kit` from the plugin list and install. Done.
+Then select `cc-prompt-kit` from the plugin list and install.
 
 ### Manual Installation
 
