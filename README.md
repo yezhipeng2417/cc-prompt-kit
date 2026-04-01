@@ -38,7 +38,7 @@ In Claude Code, run:
 Then enter the marketplace source:
 
 ```
-yezhipeng2417/cc-prompt-kit
+louisyeaaah/cc-prompt-kit
 ```
 
 Select `cc-prompt-kit` from the plugin list and install. Done.
@@ -46,7 +46,7 @@ Select `cc-prompt-kit` from the plugin list and install. Done.
 ### Manual Installation
 
 ```bash
-git clone https://github.com/yezhipeng2417/cc-prompt-kit.git ~/.claude/plugins/cc-prompt-kit
+git clone https://github.com/louisyeaaah/cc-prompt-kit.git ~/.claude/plugins/cc-prompt-kit
 ```
 
 Then in Claude Code, run `/reload-plugins` to activate.
