@@ -1,0 +1,12 @@
+{
+  "name": "cc-prompt-kit",
+  "description": "Prompt engineering toolkit with techniques extracted from Claude Code's internal prompts (512K LOC source analysis). Five skills: architect (build from scratch), forge (refine existing), judge (score & diagnose), debug (symptom-driven diagnosis), compress (token optimization).",
+  "version": "1.1.0",
+  "skills": [
+    "skills/prompt-architect",
+    "skills/prompt-forge",
+    "skills/prompt-judge",
+    "skills/prompt-debug",
+    "skills/prompt-compress"
+  ]
+}
